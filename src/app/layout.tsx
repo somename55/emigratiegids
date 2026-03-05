@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { DM_Serif_Display, Source_Sans_3 } from 'next/font/google'
 import './globals.css'
+import Navigation from '@/components/Navigation'
+import Footer from '@/components/Footer'
 
 const dmSerif = DM_Serif_Display({
   weight: '400',
@@ -37,7 +39,9 @@ export default function RootLayout({
   return (
     <html lang="nl" className={`${dmSerif.variable} ${sourceSans.variable}`}>
       <body className="font-sans text-darkText bg-lightBg antialiased">
-        {children}
+        <Navigation />
+        <main>{children}</main>
+        <Footer />
       </body>
     </html>
   )
