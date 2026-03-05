@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Compass, Menu, X } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Compass, Menu, X, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,12 +18,66 @@ const Navigation = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const landenData = {
+    "Europa": [
+      "België", "Bulgarije", "Cyprus", "Denemarken", "Duitsland", "Finland", 
+      "Frankrijk", "Georgië", "Griekenland", "Hongarije", "Ierland", "Italië", 
+      "Kroatië", "Luxemburg", "Malta", "Noorwegen", "Oostenrijk", "Polen", 
+      "Portugal", "Roemenië", "Slovenië", "Spanje", "Turkije", "Tsjechië", 
+      "Verenigd Koninkrijk", "Zweden", "Zwitserland"
+    ],
+    "Afrika": ["Zuid-Afrika"],
+    "Amerika's": [
+      "Argentinië", "Brazilië", "Canada", "Chili", "Costa Rica", "Curaçao", 
+      "Dominicaanse Republiek", "Mexico", "Panama", "Paraguay", "Uruguay", "Verenigde Staten"
+    ],
+    "Azië & Oceanië": [
+      "Australië", "Filipijnen", "Indonesië", "Japan", "Maleisië", 
+      "Nieuw-Zeeland", "Singapore", "Thailand"
+    ],
+    "Midden-Oosten": ["Oman", "Verenigde Arabische Emiraten"]
+  }
+
+  const essentialsItems = [
+    "AOW & Pensioen", "Bankieren", "Belastingen", "Huisdieren", "Ondernemen", 
+    "Onderwijs", "Uitschrijven", "Visum & Verblijfsvergunning", "Wonen & Huis Kopen", "Zorgverzekering"
+  ]
+
+  const convertToSlug = (text: string) => {
+    return text.toLowerCase()
+      .replace(/&/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+      .replace(/--+/g, '-')
+      .replace(/^-|-$/g, '')
+  }
+
   const navItems = [
-    { label: 'Home', href: '#home' },
-    { label: 'Gidsen', href: '#gidsen' },
-    { label: 'Onderwerpen', href: '#onderwerpen' },
-    { label: 'Over Ons', href: '#over' },
-    { label: 'Blog', href: '#blog' },
+    { label: 'Home', href: '/' },
+    { 
+      label: 'Emigratiegidsen', 
+      href: '/gidsen',
+      dropdown: [
+        { label: 'Portugal 2026', href: '/gidsen/portugal' },
+        { label: 'Spanje 2026', href: '/gidsen/spanje' }
+      ]
+    },
+    { 
+      label: 'Landen', 
+      href: '/landen',
+      megaMenu: landenData
+    },
+    { 
+      label: 'Emigratie Essentials', 
+      href: '/essentials',
+      dropdown: essentialsItems.map(item => ({
+        label: item,
+        href: `/essentials/${convertToSlug(item)}`
+      }))
+    },
+    { label: 'Blog', href: '/blog' },
+    { label: 'Over Ons', href: '/over-ons' },
+    { label: 'Contact', href: '/contact' },
   ]
 
   return (
@@ -43,45 +99,117 @@ const Navigation = () => {
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.3 }}
           >
-            <Compass className="h-8 w-8 text-primary" />
-            <span className="font-serif text-xl font-bold text-primary">
-              EMIGRATIE KOMPAS
-            </span>
+            <Link href="/" className="flex items-center space-x-2">
+              <Compass className="h-8 w-8 text-primary" />
+              <span className="font-serif text-xl font-bold text-primary">
+                EMIGRATIE KOMPAS
+              </span>
+            </Link>
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-6">
             {navItems.map((item, index) => (
-              <motion.a
+              <div 
                 key={item.label}
-                href={item.href}
-                className="text-darkText hover:text-primary transition-colors duration-300 font-medium"
-                whileHover={{ y: -2 }}
-                transition={{ duration: 0.3 }}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className="relative"
+                onMouseEnter={() => (item.dropdown || item.megaMenu) && setActiveDropdown(item.label)}
+                onMouseLeave={() => setActiveDropdown(null)}
               >
-                {item.label}
-              </motion.a>
+                <Link
+                  href={item.href}
+                  className="flex items-center text-darkText hover:text-primary transition-colors duration-300 font-medium py-2"
+                >
+                  {item.label}
+                  {(item.dropdown || item.megaMenu) && (
+                    <ChevronDown className="ml-1 h-4 w-4" />
+                  )}
+                </Link>
+
+                {/* Regular Dropdown */}
+                <AnimatePresence>
+                  {item.dropdown && activeDropdown === item.label && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full left-0 mt-2 w-64 bg-white shadow-xl rounded-lg border border-gray-100 py-2 z-50"
+                    >
+                      {item.dropdown.map((subItem) => (
+                        <Link
+                          key={subItem.href}
+                          href={subItem.href}
+                          className="block px-4 py-2 text-sm text-darkText hover:bg-gray-50 hover:text-primary transition-colors"
+                        >
+                          {subItem.label}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Mega Menu for Landen */}
+                <AnimatePresence>
+                  {item.megaMenu && activeDropdown === item.label && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-screen max-w-4xl bg-white shadow-xl rounded-lg border border-gray-100 py-6 z-50"
+                    >
+                      <div className="grid grid-cols-4 gap-6 px-6">
+                        {Object.entries(item.megaMenu).map(([continent, countries]) => (
+                          <div key={continent}>
+                            <h3 className="font-semibold text-primary mb-3 text-sm uppercase tracking-wide">
+                              {continent}
+                            </h3>
+                            <div className="space-y-1">
+                              {countries.map((country) => (
+                                <Link
+                                  key={country}
+                                  href={`/landen/${convertToSlug(country)}`}
+                                  className="block text-sm text-darkText hover:text-primary transition-colors py-1"
+                                >
+                                  {country}
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-6 px-6 pt-4 border-t border-gray-100">
+                        <Link 
+                          href="/landen"
+                          className="inline-flex items-center text-primary font-medium hover:text-accent transition-colors"
+                        >
+                          Alle landen bekijken →
+                        </Link>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             ))}
             
             {/* CTA Button */}
-            <motion.button
-              className="bg-accent hover:bg-accent/90 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
             >
-              Start Jouw Route
-            </motion.button>
+              <Link
+                href="/gidsen"
+                className="bg-accent hover:bg-accent/90 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg"
+              >
+                Start Jouw Route
+              </Link>
+            </motion.div>
           </div>
 
           {/* Mobile menu button */}
           <motion.button
-            className="md:hidden p-2"
+            className="lg:hidden p-2"
             onClick={() => setIsOpen(!isOpen)}
             whileTap={{ scale: 0.95 }}
           >
@@ -95,33 +223,90 @@ const Navigation = () => {
       </div>
 
       {/* Mobile Navigation */}
-      <motion.div
-        className={`md:hidden ${isOpen ? 'block' : 'hidden'}`}
-        initial={{ opacity: 0, height: 0 }}
-        animate={{ 
-          opacity: isOpen ? 1 : 0, 
-          height: isOpen ? 'auto' : 0 
-        }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="bg-white/95 backdrop-blur-sm border-t border-gray-200">
-          <div className="px-4 py-6 space-y-4">
-            {navItems.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className="block text-darkText hover:text-primary transition-colors duration-300 font-medium py-2"
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="lg:hidden bg-white/95 backdrop-blur-sm border-t border-gray-200"
+          >
+            <div className="px-4 py-6 space-y-4 max-h-[70vh] overflow-y-auto">
+              {navItems.map((item) => (
+                <div key={item.label}>
+                  <Link
+                    href={item.href}
+                    className="block text-darkText hover:text-primary transition-colors duration-300 font-medium py-2"
+                    onClick={() => !item.dropdown && !item.megaMenu && setIsOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                  
+                  {/* Mobile Dropdown */}
+                  {item.dropdown && (
+                    <div className="ml-4 mt-2 space-y-2">
+                      {item.dropdown.map((subItem) => (
+                        <Link
+                          key={subItem.href}
+                          href={subItem.href}
+                          className="block text-sm text-gray-600 hover:text-primary py-1"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {subItem.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Mobile Mega Menu */}
+                  {item.megaMenu && (
+                    <div className="ml-4 mt-2">
+                      {Object.entries(item.megaMenu).map(([continent, countries]) => (
+                        <div key={continent} className="mb-4">
+                          <h4 className="font-medium text-primary text-sm mb-2">{continent}</h4>
+                          <div className="space-y-1">
+                            {countries.slice(0, 5).map((country) => (
+                              <Link
+                                key={country}
+                                href={`/landen/${convertToSlug(country)}`}
+                                className="block text-sm text-gray-600 hover:text-primary py-1"
+                                onClick={() => setIsOpen(false)}
+                              >
+                                {country}
+                              </Link>
+                            ))}
+                            {countries.length > 5 && (
+                              <span className="text-xs text-gray-500">
+                                en {countries.length - 5} meer...
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      <Link
+                        href="/landen"
+                        className="text-primary text-sm font-medium"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Alle landen →
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              ))}
+              
+              <Link
+                href="/gidsen"
+                className="block w-full bg-accent text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 mt-4 text-center"
                 onClick={() => setIsOpen(false)}
               >
-                {item.label}
-              </a>
-            ))}
-            <button className="w-full bg-accent text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 mt-4">
-              Start Jouw Route
-            </button>
-          </div>
-        </div>
-      </motion.div>
+                Start Jouw Route
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   )
 }
