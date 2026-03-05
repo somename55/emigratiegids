@@ -3,35 +3,41 @@
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const DestinationsSection = () => {
   const destinations = [
     {
       name: 'Spanje',
+      slug: 'spanje',
       description: 'Zon, cultuur en een ontspannen levensritme',
       image: 'https://images.unsplash.com/photo-1543783207-ec64e4d95325?q=80&w=800',
       alt: 'Spaans dorpje met traditionele architectuur'
     },
     {
       name: 'Portugal',
+      slug: 'portugal',
       description: 'Betaalbaar, veilig en prachtig klimaat',
       image: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?q=80&w=800',
       alt: 'Kleurrijke gebouwen in Lissabon'
     },
     {
       name: 'Frankrijk',
+      slug: 'frankrijk',
       description: 'Ruimte, natuur en savoir-vivre',
       image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800',
       alt: 'Frans landschap met lavendelvelden'
     },
     {
       name: 'Italië',
+      slug: 'italie',
       description: 'La dolce vita voor wie van het goede leven houdt',
       image: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=800',
       alt: 'Pittoreske Italiaanse kustlijn'
     },
     {
       name: 'Griekenland',
+      slug: 'griekenland',
       description: 'Eilandleven of vasteland, altijd bijzonder',
       image: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=800',
       alt: 'Witte huisjes op Santorini'
@@ -89,6 +95,7 @@ const DestinationsSection = () => {
               variants={cardVariants}
               className="group card-hover cursor-pointer"
             >
+              <Link href={`/landen/${destination.slug}`} className="block h-full">
               <div className="bg-white rounded-2xl overflow-hidden shadow-lg h-full">
                 {/* Image */}
                 <div className="relative h-48 overflow-hidden">
@@ -118,6 +125,7 @@ const DestinationsSection = () => {
                   </div>
                 </div>
               </div>
+              </Link>
             </motion.div>
           ))}
         </motion.div>
@@ -130,9 +138,9 @@ const DestinationsSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <button className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
+          <Link href="/landen" className="inline-block bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
             Bekijk Alle Bestemmingen
-          </button>
+          </Link>
         </motion.div>
       </div>
     </section>
