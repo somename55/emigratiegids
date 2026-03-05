@@ -18,26 +18,6 @@ const Navigation = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const landenData = {
-    "Europa": [
-      "België", "Bulgarije", "Cyprus", "Denemarken", "Duitsland", "Finland", 
-      "Frankrijk", "Georgië", "Griekenland", "Hongarije", "Ierland", "Italië", 
-      "Kroatië", "Luxemburg", "Malta", "Noorwegen", "Oostenrijk", "Polen", 
-      "Portugal", "Roemenië", "Slovenië", "Spanje", "Turkije", "Tsjechië", 
-      "Verenigd Koninkrijk", "Zweden", "Zwitserland"
-    ],
-    "Afrika": ["Zuid-Afrika"],
-    "Amerika's": [
-      "Argentinië", "Brazilië", "Canada", "Chili", "Costa Rica", "Curaçao", 
-      "Dominicaanse Republiek", "Mexico", "Panama", "Paraguay", "Uruguay", "Verenigde Staten"
-    ],
-    "Azië & Oceanië": [
-      "Australië", "Filipijnen", "Indonesië", "Japan", "Maleisië", 
-      "Nieuw-Zeeland", "Singapore", "Thailand"
-    ],
-    "Midden-Oosten": ["Oman", "Verenigde Arabische Emiraten"]
-  }
-
   const essentialsItems = [
     "AOW & Pensioen", "Bankieren", "Belastingen", "Huisdieren", "Ondernemen", 
     "Onderwijs", "Uitschrijven", "Visum & Verblijfsvergunning", "Wonen & Huis Kopen", "Zorgverzekering"
@@ -61,11 +41,6 @@ const Navigation = () => {
         { label: 'Portugal 2026', href: '/gidsen/portugal' },
         { label: 'Spanje 2026', href: '/gidsen/spanje' }
       ]
-    },
-    { 
-      label: 'Landen', 
-      href: '/landen',
-      megaMenu: landenData
     },
     { 
       label: 'Emigratie Essentials', 
@@ -109,11 +84,11 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-6">
-            {navItems.map((item, index) => (
+            {navItems.map((item) => (
               <div 
                 key={item.label}
                 className="relative"
-                onMouseEnter={() => (item.dropdown || item.megaMenu) && setActiveDropdown(item.label)}
+                onMouseEnter={() => item.dropdown && setActiveDropdown(item.label)}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
                 <Link
@@ -121,12 +96,12 @@ const Navigation = () => {
                   className="flex items-center text-darkText hover:text-primary transition-colors duration-300 font-medium py-2"
                 >
                   {item.label}
-                  {(item.dropdown || item.megaMenu) && (
+                  {item.dropdown && (
                     <ChevronDown className="ml-1 h-4 w-4" />
                   )}
                 </Link>
 
-                {/* Regular Dropdown */}
+                {/* Dropdown */}
                 <AnimatePresence>
                   {item.dropdown && activeDropdown === item.label && (
                     <motion.div
@@ -145,48 +120,6 @@ const Navigation = () => {
                           {subItem.label}
                         </Link>
                       ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* Mega Menu for Landen */}
-                <AnimatePresence>
-                  {item.megaMenu && activeDropdown === item.label && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-screen max-w-4xl bg-white shadow-xl rounded-lg border border-gray-100 py-6 z-50"
-                    >
-                      <div className="grid grid-cols-4 gap-6 px-6">
-                        {Object.entries(item.megaMenu).map(([continent, countries]) => (
-                          <div key={continent}>
-                            <h3 className="font-semibold text-primary mb-3 text-sm uppercase tracking-wide">
-                              {continent}
-                            </h3>
-                            <div className="space-y-1">
-                              {countries.map((country) => (
-                                <Link
-                                  key={country}
-                                  href={`/landen/${convertToSlug(country)}`}
-                                  className="block text-sm text-darkText hover:text-primary transition-colors py-1"
-                                >
-                                  {country}
-                                </Link>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-6 px-6 pt-4 border-t border-gray-100">
-                        <Link 
-                          href="/landen"
-                          className="inline-flex items-center text-primary font-medium hover:text-accent transition-colors"
-                        >
-                          Alle landen bekijken →
-                        </Link>
-                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -238,7 +171,7 @@ const Navigation = () => {
                   <Link
                     href={item.href}
                     className="block text-darkText hover:text-primary transition-colors duration-300 font-medium py-2"
-                    onClick={() => !item.dropdown && !item.megaMenu && setIsOpen(false)}
+                    onClick={() => !item.dropdown && setIsOpen(false)}
                   >
                     {item.label}
                   </Link>
@@ -256,41 +189,6 @@ const Navigation = () => {
                           {subItem.label}
                         </Link>
                       ))}
-                    </div>
-                  )}
-
-                  {/* Mobile Mega Menu */}
-                  {item.megaMenu && (
-                    <div className="ml-4 mt-2">
-                      {Object.entries(item.megaMenu).map(([continent, countries]) => (
-                        <div key={continent} className="mb-4">
-                          <h4 className="font-medium text-primary text-sm mb-2">{continent}</h4>
-                          <div className="space-y-1">
-                            {countries.slice(0, 5).map((country) => (
-                              <Link
-                                key={country}
-                                href={`/landen/${convertToSlug(country)}`}
-                                className="block text-sm text-gray-600 hover:text-primary py-1"
-                                onClick={() => setIsOpen(false)}
-                              >
-                                {country}
-                              </Link>
-                            ))}
-                            {countries.length > 5 && (
-                              <span className="text-xs text-gray-500">
-                                en {countries.length - 5} meer...
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                      <Link
-                        href="/landen"
-                        className="text-primary text-sm font-medium"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Alle landen →
-                      </Link>
                     </div>
                   )}
                 </div>

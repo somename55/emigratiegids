@@ -1,7 +1,6 @@
 'use client'
 
 import HeroSection from '@/components/HeroSection'
-import DestinationsSection from '@/components/DestinationsSection'
 import TopicsSection from '@/components/TopicsSection'
 import FeaturedGuideSection from '@/components/FeaturedGuideSection'
 import EmigrantTypesSection from '@/components/EmigrantTypesSection'
@@ -13,7 +12,6 @@ export default function Home() {
   return (
     <>
       <HeroSection />
-      <DestinationsSection />
       <TopicsSection />
       <FeaturedGuideSection />
       <EmigrantTypesSection />
