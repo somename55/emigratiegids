@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Check, MapPin, Thermometer, Euro, Clock, Globe } from 'lucide-react'
+import { Check, MapPin, Thermometer, Euro, Clock, Globe, ClipboardList } from 'lucide-react'
 import { countries, getCountryBySlug } from '@/data/countries'
 import { essentials } from '@/data/essentials'
 
@@ -181,7 +181,7 @@ export default async function CountryPage({ params }: CountryPageProps) {
               >
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <span className="text-primary text-lg">📋</span>
+                    <ClipboardList className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-darkText group-hover:text-primary transition-colors mb-2">
